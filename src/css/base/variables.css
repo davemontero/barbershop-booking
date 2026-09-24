@@ -1,0 +1,46 @@
+:root {
+  /* Colors */
+  --color-background: #f5f2ea;
+  --color-surface: #ffffff;
+
+  --color-header: #202527;
+  --color-text: #202427;
+  --color-text-muted: #6c6f70;
+
+  --color-primary: #c9a24c;
+  --color-primary-hover: #b68e39;
+  --color-primary-light: #e4ce91;
+
+  --color-border: #d8d8d4;
+  --color-border-dark: #b9bab7;
+
+  --color-success: #252b2d;
+
+  /* Typography */
+  --font-family-base: "Arial", sans-serif;
+
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  /* Layout */
+  --container-max-width: 75rem;
+
+  /* Borders */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.08);
+}
