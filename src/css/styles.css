@@ -11,6 +11,7 @@
 /* Components */
 @import "./components/button.css";
 @import "./components/progress-stepper.css";
+@import "./components/service-card.css";
 
 /* Pages */
 @import "./pages/service.css";
