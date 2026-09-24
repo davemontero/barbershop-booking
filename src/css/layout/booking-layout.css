@@ -1,0 +1,31 @@
+.booking-main {
+  min-height: calc(100vh - 5rem);
+  padding-bottom: var(--space-7);
+}
+
+.booking-content {
+  padding-block: var(--space-4);
+}
+
+.booking-content__header {
+  margin-bottom: var(--space-5);
+}
+
+.booking-content__title {
+  margin-bottom: var(--space-2);
+
+  font-size: clamp(1.5rem, 5vw, var(--font-size-2xl));
+
+  text-transform: uppercase;
+}
+
+.booking-content__subtitle {
+  margin-bottom: 0;
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 48rem) {
+  .booking-content {
+    padding-block: var(--space-5);
+  }
+}

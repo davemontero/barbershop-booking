@@ -1,8 +1,25 @@
 import "../css/styles.css";
 
-import { siteConfig } from "./config/site-config.js";
 import { bookingState } from "./state.js";
 
-console.log("Booking application started");
-console.log(siteConfig);
-console.log(bookingState);
+import { renderHeader } from "./components/header.js";
+import { renderProgressStepper } from "./components/progress-stepper.js";
+import { renderServicePage } from "./components/service-page.js";
+
+const app = document.querySelector("#app");
+
+function renderApp() {
+  app.innerHTML = `
+    ${renderHeader()}
+
+    <main class="booking-main">
+      <div class="container">
+        ${renderProgressStepper(bookingState.currentStep)}
+
+        ${renderServicePage()}
+      </div>
+    </main>
+  `;
+}
+
+renderApp();
