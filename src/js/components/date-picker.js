@@ -1,9 +1,54 @@
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
+import { renderStatusMessage } from "./status-message.js";
 
 let datePickerInstance = null;
 
-export function renderDatePicker() {
+export function renderDatePicker({
+  status = "idle",
+  errorMessage = null,
+} = {}) {
+  if (status === "loading") {
+    return `
+      <div class="date-picker">
+        ${renderStatusMessage({
+          icon: "loader",
+          title: "Loading available dates",
+          message: "Checking appointment availability...",
+          loading: true,
+        })}
+      </div>
+    `;
+  }
+
+  if (status === "error") {
+    return `
+      <div class="date-picker">
+        ${renderStatusMessage({
+          icon: "alert",
+          title: "Unable to load dates",
+          message: errorMessage ?? "Please try again in a moment.",
+        })}
+      </div>
+    `;
+  }
+
+  if (status === "empty") {
+    return `
+      <div class="date-picker">
+        ${renderStatusMessage({
+          icon: "calendar",
+          title: "No dates available",
+          message: "Try another barber or service.",
+        })}
+      </div>
+    `;
+  }
+
+  if (status !== "success") {
+    return "";
+  }
+
   return `
     <div class="date-picker">
       <input

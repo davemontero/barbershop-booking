@@ -35,63 +35,120 @@ export function renderAppointmentSummary(bookingState) {
       ? "First Available"
       : "Not selected");
 
+  const barberNote =
+    bookingState.barberPreference === "first-available" && bookingState.barber
+      ? "Assigned from First Available"
+      : null;
+
   return `
     <aside class="appointment-summary">
-      <h2 class="appointment-summary__title">
-        Your Appointment
-      </h2>
+      <header class="appointment-summary__header">
+        <h2>
+          Your Appointment
+        </h2>
+      </header>
 
-      <div class="appointment-summary__item">
-        ${renderIcon("user")}
+      <div class="appointment-summary__body">
+        <div class="appointment-summary__item">
+          <span class="appointment-summary__icon">
+            ${renderIcon("scissors")}
+          </span>
 
-        <div>
-          <span>Service</span>
+          <div>
+            <span class="appointment-summary__label">
+              Service
+            </span>
 
-          <strong>
-            ${bookingState.service?.name}
-          </strong>
+            <strong>
+              ${bookingState.service?.name ?? "Not selected"}
+            </strong>
 
-          <small>
-            $${bookingState.service?.price}
-          </small>
+            ${
+              bookingState.service
+                ? `
+                  <small>
+                    ${bookingState.service.duration} min
+                    ·
+                    $${bookingState.service.price}
+                  </small>
+                `
+                : ""
+            }
+          </div>
+        </div>
+
+        <div class="appointment-summary__item">
+          <span class="appointment-summary__icon">
+            ${renderIcon("user")}
+          </span>
+
+          <div>
+            <span class="appointment-summary__label">
+              Barber
+            </span>
+
+            <strong>
+              ${barberName}
+            </strong>
+
+            ${
+              barberNote
+                ? `
+                  <small>
+                    ${barberNote}
+                  </small>
+                `
+                : ""
+            }
+          </div>
+        </div>
+
+        <div class="appointment-summary__item">
+          <span class="appointment-summary__icon">
+            ${renderIcon("calendar")}
+          </span>
+
+          <div>
+            <span class="appointment-summary__label">
+              Date
+            </span>
+
+            <strong>
+              ${formatDate(bookingState.date)}
+            </strong>
+          </div>
+        </div>
+
+        <div class="appointment-summary__item">
+          <span class="appointment-summary__icon">
+            ${renderIcon("clock")}
+          </span>
+
+          <div>
+            <span class="appointment-summary__label">
+              Time
+            </span>
+
+            <strong>
+              ${formatTime(bookingState.time)}
+            </strong>
+          </div>
         </div>
       </div>
 
-      <div class="appointment-summary__item">
-        ${renderIcon("user")}
+      ${
+        bookingState.service
+          ? `
+            <footer class="appointment-summary__footer">
+              <span>Total</span>
 
-        <div>
-          <span>Barber</span>
-
-          <strong>
-            ${barberName}
-          </strong>
-        </div>
-      </div>
-
-      <div class="appointment-summary__item">
-        ${renderIcon("calendar")}
-
-        <div>
-          <span>Date</span>
-
-          <strong>
-            ${formatDate(bookingState.date)}
-          </strong>
-        </div>
-      </div>
-
-      <div class="appointment-summary__item">
-        ${renderIcon("clock")}
-
-        <div>
-          <span>Time</span>
-
-          <strong>
-            ${formatTime(bookingState.time)}
-          </strong>
-        </div>
-      </div>
+              <strong>
+                $${bookingState.service.price}
+              </strong>
+            </footer>
+          `
+          : ""
+      }
     </aside>
   `;
 }

@@ -6,6 +6,9 @@ import usersIcon from "@tabler/icons/outline/users.svg?raw";
 import calendarIcon from "@tabler/icons/outline/calendar.svg?raw";
 import clockIcon from "@tabler/icons/outline/clock.svg?raw";
 import userIcon from "@tabler/icons/outline/user.svg?raw";
+import loaderIcon from "@tabler/icons/outline/loader-2.svg?raw";
+import alertIcon from "@tabler/icons/outline/alert-circle.svg?raw";
+import scissorsIcon from "@tabler/icons/outline/scissors.svg?raw";
 
 const icons = {
   "arrow-left": arrowLeftIcon,
@@ -16,6 +19,9 @@ const icons = {
   calendar: calendarIcon,
   clock: clockIcon,
   user: userIcon,
+  loader: loaderIcon,
+  alert: alertIcon,
+  scissors: scissorsIcon,
 };
 
 export function renderIcon(name) {

@@ -1,3 +1,5 @@
+import { renderStatusMessage } from "./status-message.js";
+
 function formatTime(time) {
   const [hours, minutes] = time.split(":").map(Number);
 
@@ -22,15 +24,44 @@ function getPeriod(time) {
   return "Evening";
 }
 
-export function renderTimeSlots(times = [], selectedTime = null) {
-  if (!times.length) {
-    return `
-      <section class="time-slots">
-        <p class="time-slots__empty">
-          Select an available date to view times.
-        </p>
-      </section>
-    `;
+export function renderTimeSlots({
+  times = [],
+  selectedTime = null,
+  status = "idle",
+  errorMessage = null,
+}) {
+  if (status === "idle") {
+    return renderStatusMessage({
+      icon: "calendar",
+      title: "Select a date",
+      message: "Available appointment times will appear here.",
+    });
+  }
+
+  if (status === "loading") {
+    return renderStatusMessage({
+      icon: "loader",
+      title: "Checking availability",
+      message: "Finding available appointment times...",
+      loading: true,
+    });
+  }
+
+  if (status === "error") {
+    return renderStatusMessage({
+      icon: "alert",
+      title: "Unable to load times",
+      message: errorMessage ?? "Please try another date or try again.",
+    });
+  }
+
+  if (status === "empty") {
+    return renderStatusMessage({
+      icon: "clock",
+      title: "No times available",
+      message:
+        "There are no appointments available on this date. Try another day.",
+    });
   }
 
   const periods = ["Morning", "Afternoon", "Evening"];
@@ -49,13 +80,11 @@ export function renderTimeSlots(times = [], selectedTime = null) {
 
           return `
               <button
-                class="
-                  time-slot
-                  ${isSelected ? "time-slot--selected" : ""}
-                "
+                class="time-slot ${isSelected ? "time-slot--selected" : ""}"
                 type="button"
                 data-action="select-time"
                 data-time="${time}"
+                aria-pressed="${isSelected}"
               >
                 ${formatTime(time)}
               </button>
@@ -64,20 +93,22 @@ export function renderTimeSlots(times = [], selectedTime = null) {
         .join("");
 
       return `
-        <div class="time-slots__group">
-          <h3>${period}</h3>
+        <section class="time-slots__group">
+          <h3 class="time-slots__period">
+            ${period}
+          </h3>
 
           <div class="time-slots__grid">
             ${buttons}
           </div>
-        </div>
+        </section>
       `;
     })
     .join("");
 
   return `
-    <section class="time-slots">
+    <div class="time-slots">
       ${groups}
-    </section>
+    </div>
   `;
 }

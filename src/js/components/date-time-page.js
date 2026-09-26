@@ -6,57 +6,62 @@ import { renderAppointmentSummary } from "./appointment-summary.js";
 
 import { renderIcon } from "./icon.js";
 
-export function renderDateTimePage(availableTimes, bookingState) {
+export function renderDateTimePage(dateTimeViewState, bookingState) {
   const canContinue = Boolean(bookingState.date && bookingState.time);
 
   return `
     <section
       class="booking-content date-time-page"
     >
-      <header
-        class="booking-content__header"
-      >
-        <h1
-          class="booking-content__title"
-        >
+      <header class="booking-content__header">
+        <h1 class="booking-content__title">
           Select Date & Time
         </h1>
 
-        <p
-          class="booking-content__subtitle"
-        >
+        <p class="booking-content__subtitle">
           Choose an available date and time.
         </p>
       </header>
 
-      <div
-        class="date-time-page__layout"
-      >
-        ${renderDatePicker()}
+      <div class="date-time-page__layout">
+        <section class="date-time-panel">
+          <h2 class="date-time-panel__title">
+            Select a Date
+          </h2>
 
-        <div
-          class="date-time-page__times"
-        >
-          <h2>
+          ${renderDatePicker({
+            status: dateTimeViewState.datesStatus,
+
+            errorMessage: dateTimeViewState.datesError,
+          })}
+        </section>
+
+        <section class="date-time-panel">
+          <h2 class="date-time-panel__title">
             Available Times
           </h2>
 
-          ${renderTimeSlots(availableTimes, bookingState.time)}
-        </div>
+          ${renderTimeSlots({
+            times: dateTimeViewState.availableTimes,
+
+            selectedTime: bookingState.time,
+
+            status: dateTimeViewState.timesStatus,
+
+            errorMessage: dateTimeViewState.timesError,
+          })}
+        </section>
 
         ${renderAppointmentSummary(bookingState)}
       </div>
 
-      <div
-        class="date-time-page__actions"
-      >
+      <div class="date-time-page__actions">
         <button
           class="button button--text"
           type="button"
           data-action="back-to-barber"
         >
           ${renderIcon("arrow-left")}
-
           Back
         </button>
 
@@ -67,7 +72,6 @@ export function renderDateTimePage(availableTimes, bookingState) {
           ${canContinue ? "" : "disabled"}
         >
           Continue
-
           ${renderIcon("arrow-right")}
         </button>
       </div>

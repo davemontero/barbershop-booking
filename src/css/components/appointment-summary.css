@@ -1,47 +1,81 @@
 .appointment-summary {
-  padding: var(--space-4);
+  overflow: hidden;
 
   border: 1px solid var(--color-border);
 
   background: var(--color-surface);
 }
 
-.appointment-summary__title {
-  margin-bottom: var(--space-5);
+.appointment-summary__header {
+  padding:
+    0.9rem
+    var(--space-4);
+
+  border-bottom:
+    1px solid
+    var(--color-border);
+}
+
+.appointment-summary__header h2 {
+  margin: 0;
 
   font-size: 0.75rem;
+  font-weight: 800;
 
   text-transform: uppercase;
+}
+
+.appointment-summary__body {
+  padding-inline: var(--space-4);
 }
 
 .appointment-summary__item {
   display: grid;
 
   grid-template-columns:
-    auto
+    1.5rem
     minmax(0, 1fr);
 
   gap: var(--space-3);
 
-  padding-block: var(--space-3);
+  padding-block: var(--space-4);
+
+  border-bottom:
+    1px solid
+    var(--color-border);
 }
 
-.appointment-summary__item svg {
-  width: 1.3rem;
-  height: 1.3rem;
+.appointment-summary__item:last-child {
+  border-bottom: 0;
+}
+
+.appointment-summary__icon {
+  display: grid;
+  place-items: start center;
+
+  color: var(--color-text);
+}
+
+.appointment-summary__icon svg {
+  width: 1.2rem;
+  height: 1.2rem;
 
   stroke-width: 1.6;
 }
 
-.appointment-summary__item div {
+.appointment-summary__item > div {
   display: flex;
   flex-direction: column;
 }
 
-.appointment-summary__item span {
+.appointment-summary__label {
+  margin-bottom: 0.15rem;
+
   color: var(--color-text-muted);
 
   font-size: 0.6rem;
+
+  text-transform: uppercase;
 }
 
 .appointment-summary__item strong {
@@ -49,5 +83,36 @@
 }
 
 .appointment-summary__item small {
-  font-size: 0.7rem;
+  margin-top: 0.15rem;
+
+  color: var(--color-text-muted);
+
+  font-size: 0.65rem;
+}
+
+.appointment-summary__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: var(--space-4);
+
+  border-top:
+    1px solid
+    var(--color-border);
+
+  background: #faf9f6;
+
+  font-size: 0.8rem;
+}
+
+.appointment-summary__footer strong {
+  font-size: 1rem;
+}
+
+@media (min-width: 64rem) {
+  .appointment-summary {
+    position: sticky;
+    top: var(--space-4);
+  }
 }

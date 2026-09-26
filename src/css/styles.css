@@ -16,6 +16,7 @@
 @import "./components/time-slot.css";
 @import "./components/appointment-summary.css";
 @import "./components/date-picker.css";
+@import "./components/status-message.css";
 
 /* Pages */
 @import "./pages/date-time.css";

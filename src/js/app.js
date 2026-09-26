@@ -1,6 +1,5 @@
 import "../css/styles.css";
 
-import { services } from "./data/mock-data.js";
 import { bookingState } from "./state.js";
 
 import { renderHeader } from "./components/header.js";
@@ -18,6 +17,19 @@ import { renderDateTimePage } from "./components/date-time-page.js";
 import { renderBarberPage } from "./components/barber-page.js";
 
 const app = document.querySelector("#app");
+
+const dateTimeViewState = {
+  availableDates: [],
+  datesStatus: "idle",
+  datesError: null,
+
+  availableTimes: [],
+  timesStatus: "idle",
+  timesError: null,
+};
+
+let datesRequestId = 0;
+let timesRequestId = 0;
 
 async function renderCurrentStep() {
   switch (bookingState.currentStep) {
@@ -45,17 +57,7 @@ async function renderCurrentStep() {
     }
 
     case 3: {
-      const availableTimes = await bookingService.getAvailableTimes({
-        serviceId: bookingState.service.id,
-
-        barberId: bookingState.barber?.id,
-
-        preference: bookingState.barberPreference,
-
-        date: bookingState.date,
-      });
-
-      return renderDateTimePage(availableTimes, bookingState);
+      return renderDateTimePage(dateTimeViewState, bookingState);
     }
 
     default:
@@ -88,18 +90,14 @@ async function initializeCurrentStep() {
     return;
   }
 
-  const availableDates = await bookingService.getAvailableDates({
-    serviceId: bookingState.service.id,
-
-    barberId: bookingState.barber?.id,
-
-    preference: bookingState.barberPreference,
-  });
+  if (dateTimeViewState.datesStatus !== "success") {
+    return;
+  }
 
   initializeDatePicker({
     element: document.querySelector("#booking-date-picker"),
 
-    availableDates,
+    availableDates: dateTimeViewState.availableDates,
 
     selectedDate: bookingState.date,
 
@@ -176,7 +174,9 @@ async function continueToDateTime() {
 
   bookingState.currentStep = 3;
 
-  await renderApp();
+  resetDateTimeViewState();
+
+  await loadAvailableDates();
 }
 
 async function backToBarber() {
@@ -187,14 +187,13 @@ async function backToBarber() {
 
 async function selectDate(date) {
   bookingState.date = date;
-
   bookingState.time = null;
 
   if (bookingState.barberPreference === "first-available") {
     bookingState.barber = null;
   }
 
-  await renderApp();
+  await loadAvailableTimes();
 }
 
 async function selectTime(time) {
@@ -283,5 +282,119 @@ app.addEventListener("click", async (event) => {
     return;
   }
 });
+
+async function loadAvailableDates() {
+  const requestId = ++datesRequestId;
+
+  dateTimeViewState.datesStatus = "loading";
+
+  dateTimeViewState.datesError = null;
+  dateTimeViewState.availableDates = [];
+
+  await renderApp();
+
+  try {
+    const availableDates = await bookingService.getAvailableDates({
+      serviceId: bookingState.service.id,
+
+      barberId: bookingState.barber?.id,
+
+      preference: bookingState.barberPreference,
+    });
+
+    if (requestId !== datesRequestId) {
+      return;
+    }
+
+    dateTimeViewState.availableDates = availableDates;
+
+    dateTimeViewState.datesStatus = availableDates.length ? "success" : "empty";
+
+    if (bookingState.date && !availableDates.includes(bookingState.date)) {
+      bookingState.date = null;
+      bookingState.time = null;
+
+      dateTimeViewState.availableTimes = [];
+      dateTimeViewState.timesStatus = "idle";
+    }
+  } catch (error) {
+    if (requestId !== datesRequestId) {
+      return;
+    }
+
+    console.error("Failed to load available dates:", error);
+
+    dateTimeViewState.datesStatus = "error";
+
+    dateTimeViewState.datesError =
+      "We couldn't load appointment dates. Please try again.";
+  }
+
+  await renderApp();
+}
+
+async function loadAvailableTimes() {
+  if (!bookingState.date) {
+    dateTimeViewState.availableTimes = [];
+    dateTimeViewState.timesStatus = "idle";
+
+    return;
+  }
+
+  const requestId = ++timesRequestId;
+
+  dateTimeViewState.timesStatus = "loading";
+
+  dateTimeViewState.timesError = null;
+  dateTimeViewState.availableTimes = [];
+
+  await renderApp();
+
+  try {
+    const availableTimes = await bookingService.getAvailableTimes({
+      serviceId: bookingState.service.id,
+
+      barberId: bookingState.barber?.id,
+
+      preference: bookingState.barberPreference,
+
+      date: bookingState.date,
+    });
+
+    if (requestId !== timesRequestId) {
+      return;
+    }
+
+    dateTimeViewState.availableTimes = availableTimes;
+
+    dateTimeViewState.timesStatus = availableTimes.length ? "success" : "empty";
+  } catch (error) {
+    if (requestId !== timesRequestId) {
+      return;
+    }
+
+    console.error("Failed to load available times:", error);
+
+    dateTimeViewState.timesStatus = "error";
+
+    dateTimeViewState.timesError =
+      "We couldn't load appointment times. Please try another date.";
+  }
+
+  await renderApp();
+}
+
+function resetDateTimeViewState() {
+  datesRequestId += 1;
+  timesRequestId += 1;
+
+  dateTimeViewState.availableDates = [];
+  dateTimeViewState.datesStatus = "idle";
+  dateTimeViewState.datesError = null;
+
+  dateTimeViewState.availableTimes = [];
+  dateTimeViewState.timesStatus = "idle";
+  dateTimeViewState.timesError = null;
+}
 
 void renderApp();
