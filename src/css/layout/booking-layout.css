@@ -1,10 +1,11 @@
 .booking-main {
-  min-height: calc(100vh - 5rem);
+  min-height: calc(100vh - 4.5rem);
+
   padding-bottom: var(--space-7);
 }
 
 .booking-content {
-  padding-block: var(--space-4);
+  padding-bottom: var(--space-6);
 }
 
 .booking-content__header {
@@ -12,20 +13,19 @@
 }
 
 .booking-content__title {
-  margin-bottom: var(--space-2);
+  margin-bottom: 0.3rem;
 
-  font-size: clamp(1.5rem, 5vw, var(--font-size-2xl));
+  font-size: clamp(1.4rem, 4vw, 1.75rem);
+
+  font-weight: 800;
 
   text-transform: uppercase;
 }
 
 .booking-content__subtitle {
   margin-bottom: 0;
-  color: var(--color-text-muted);
-}
 
-@media (min-width: 48rem) {
-  .booking-content {
-    padding-block: var(--space-5);
-  }
+  color: var(--color-text);
+
+  font-size: 0.9rem;
 }

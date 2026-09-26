@@ -1,12 +1,19 @@
 .progress-stepper {
-  padding-block: var(--space-5);
+  width: min(100%, 40rem);
+
+  margin-inline: auto;
+
+  padding-block: var(--space-5) var(--space-6);
 }
 
 .progress-stepper__list {
   display: grid;
+
   grid-template-columns: repeat(4, 1fr);
+
   margin: 0;
   padding: 0;
+
   list-style: none;
 }
 
@@ -17,19 +24,19 @@
   flex-direction: column;
   align-items: center;
 
-  gap: var(--space-2);
+  gap: 0.4rem;
 
   color: var(--color-text-muted);
+
   text-align: center;
 }
-
-/* Connecting line */
 
 .progress-stepper__step:not(:last-child)::after {
   content: "";
 
   position: absolute;
-  top: 0.9rem;
+
+  top: 0.8rem;
   left: calc(50% + 1rem);
 
   width: calc(100% - 2rem);
@@ -38,8 +45,6 @@
   background: var(--color-border-dark);
 }
 
-/* Circle */
-
 .progress-stepper__indicator {
   position: relative;
   z-index: 1;
@@ -47,27 +52,24 @@
   display: grid;
   place-items: center;
 
-  width: 1.8rem;
-  height: 1.8rem;
+  width: 1.6rem;
+  height: 1.6rem;
 
   border: 1px solid var(--color-border-dark);
   border-radius: 50%;
 
   background: var(--color-background);
 
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 700;
 }
 
-/* Label */
-
 .progress-stepper__label {
-  font-size: 0.65rem;
+  font-size: 0.58rem;
   font-weight: 600;
+
   text-transform: uppercase;
 }
-
-/* Active */
 
 .progress-stepper__step--active {
   color: var(--color-text);
@@ -75,11 +77,11 @@
 
 .progress-stepper__step--active .progress-stepper__indicator {
   border-color: var(--color-primary);
+
   background: var(--color-primary);
+
   color: var(--color-text);
 }
-
-/* Completed */
 
 .progress-stepper__step--completed {
   color: var(--color-text);
@@ -87,27 +89,18 @@
 
 .progress-stepper__step--completed .progress-stepper__indicator {
   border-color: var(--color-header);
+
   background: var(--color-header);
+
   color: var(--color-surface);
 }
 
-/* Tablet */
-
 @media (min-width: 48rem) {
   .progress-stepper {
-    padding-block: var(--space-6);
-  }
-
-  .progress-stepper__indicator {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  .progress-stepper__step:not(:last-child)::after {
-    top: 1rem;
+    padding-block: 1.5rem 1.75rem;
   }
 
   .progress-stepper__label {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
   }
 }

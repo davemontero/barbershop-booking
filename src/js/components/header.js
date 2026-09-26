@@ -1,4 +1,5 @@
 import { siteConfig } from "../config/site-config.js";
+import { renderIcon } from "./icon.js";
 
 export function renderHeader() {
   return `
@@ -14,7 +15,13 @@ export function renderHeader() {
         </a>
 
         <a class="site-header__back-link" href="/">
-          <span aria-hidden="true">←</span>
+          <span
+            class="site-header__back-icon"
+            aria-hidden="true"
+          >
+            ${renderIcon("arrow-left")}
+          </span>
+
           Back to Site
         </a>
       </div>

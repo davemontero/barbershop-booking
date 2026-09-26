@@ -2,7 +2,10 @@ export const bookingState = {
   currentStep: 1,
 
   service: null,
+
   barber: null,
+  barberPreference: null,
+
   date: null,
   time: null,
 

@@ -7,54 +7,77 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 5rem;
+
+  min-height: 4.25rem;
+
   gap: var(--space-4);
 }
 
 .site-header__brand {
   display: inline-flex;
   flex-direction: column;
-  color: inherit;
+
+  color: var(--color-primary);
+
   text-decoration: none;
   text-transform: uppercase;
-  line-height: 1;
+
+  line-height: 0.95;
 }
 
 .site-header__brand-small {
   margin-bottom: 0.2rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.18em;
-  color: var(--color-primary);
+
+  font-size: 0.55rem;
+
+  letter-spacing: 0.16em;
 }
 
 .site-header__brand-main {
-  max-width: 8rem;
-  font-size: 0.95rem;
+  max-width: 7rem;
+
+  font-size: 0.8rem;
   font-weight: 700;
+
   letter-spacing: 0.14em;
   line-height: 1.05;
-  color: var(--color-primary);
 }
 
 .site-header__back-link {
   display: inline-flex;
   align-items: center;
+
   gap: var(--space-2);
+
   color: var(--color-surface);
-  font-size: var(--font-size-sm);
+
+  font-size: 0.75rem;
+
   text-decoration: none;
 }
 
 .site-header__back-link:hover {
-  color: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 @media (min-width: 48rem) {
   .site-header__inner {
-    min-height: 5.5rem;
+    min-height: 4.5rem;
   }
 
   .site-header__brand-main {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
+}
+
+.site-header__back-icon {
+  display: grid;
+  place-items: center;
+}
+
+.site-header__back-icon svg {
+  width: 1rem;
+  height: 1rem;
+
+  stroke-width: 1.7;
 }

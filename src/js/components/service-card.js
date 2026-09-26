@@ -1,39 +1,48 @@
+import { renderIcon } from "./icon.js";
+
 export function renderServiceCard(service, selectedServiceId = null) {
   const isSelected = service.id === selectedServiceId;
 
   return `
-    <article
+    <button
       class="service-card ${isSelected ? "service-card--selected" : ""}"
+      type="button"
+      data-action="select-service"
       data-service-id="${service.id}"
+      aria-pressed="${isSelected}"
     >
-      <div class="service-card__content">
-        <h2 class="service-card__title">
-          ${service.name}
-        </h2>
+      <span class="service-card__icon">
+        <img
+          src="${service.icon}"
+          alt=""
+          aria-hidden="true"
+        >
+      </span>
 
-        <p class="service-card__description">
-          ${service.description}
-        </p>
+      <span class="service-card__name">
+        ${service.name}
+      </span>
 
-        <div class="service-card__meta">
-          <span>${service.duration} min</span>
-          <span class="service-card__separator" aria-hidden="true">•</span>
-          <span>$${service.price}</span>
-        </div>
-      </div>
-
-      <button
-        class="button button--primary service-card__button"
-        type="button"
-        data-action="select-service"
-        data-service-id="${service.id}"
-      >
-        ${isSelected ? "Selected" : "Select"}
-
-        <span aria-hidden="true">
-          ${isSelected ? "✓" : "→"}
+      <span class="service-card__details">
+        <span class="service-card__duration">
+          ${service.duration} min
         </span>
-      </button>
-    </article>
+
+        <span class="service-card__description">
+          ${service.description}
+        </span>
+      </span>
+
+      <span class="service-card__price">
+        $${service.price}
+      </span>
+
+      <span
+        class="service-card__arrow"
+        aria-hidden="true"
+      >
+        ${renderIcon("chevron-right")}
+      </span>
+    </button>
   `;
 }

@@ -1,75 +1,172 @@
 .service-card {
   display: grid;
-  gap: var(--space-4);
 
-  padding: var(--space-5);
+  grid-template-columns:
+    3.5rem
+    9rem
+    minmax(0, 1fr)
+    4rem
+    1.5rem;
+
+  align-items: center;
+
+  width: 100%;
+  min-height: 4.5rem;
+
+  padding: 0.75rem 1rem;
 
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: 0;
 
   background: var(--color-surface);
+  color: var(--color-text);
 
-  box-shadow: var(--shadow-sm);
+  text-align: left;
 
   transition:
     border-color 160ms ease,
-    transform 160ms ease,
-    box-shadow 160ms ease;
+    background-color 160ms ease;
 }
 
 .service-card:hover {
-  border-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+  background: #fcfaf5;
+}
+
+.service-card:focus-visible {
+  position: relative;
+  z-index: 1;
+
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .service-card--selected {
   border-color: var(--color-primary);
+  background: #faf5e7;
 }
 
-.service-card__content {
-  min-width: 0;
+/* Icon */
+
+.service-card__icon {
+  display: grid;
+  place-items: center;
+
+  width: 2.75rem;
+  height: 2.75rem;
 }
 
-.service-card__title {
-  margin-bottom: var(--space-2);
+.service-card__icon img {
+  display: block;
 
-  font-size: var(--font-size-lg);
+  width: 2rem;
+  height: 2rem;
+
+  object-fit: contain;
+}
+
+/* Service name */
+
+.service-card__name {
+  font-size: 0.78rem;
+  font-weight: 800;
+
   text-transform: uppercase;
 }
 
-.service-card__description {
-  margin-bottom: var(--space-3);
+/* Duration + description */
 
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-}
-
-.service-card__meta {
+.service-card__details {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  flex-direction: column;
 
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+  gap: 0.1rem;
+
+  min-width: 0;
 }
 
-.service-card__separator {
-  color: var(--color-primary);
+.service-card__duration {
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
-.service-card__button {
-  align-self: end;
-  justify-self: start;
+.service-card__description {
+  color: var(--color-text-muted);
+
+  font-size: 0.7rem;
+  line-height: 1.35;
 }
 
-/* Tablet */
+/* Price */
 
-@media (min-width: 48rem) {
+.service-card__price {
+  justify-self: end;
+
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+/* Arrow */
+
+.service-card__arrow {
+  justify-self: end;
+
+  font-size: 1.8rem;
+  font-weight: 300;
+
+  line-height: 1;
+}
+
+@media (max-width: 47.99rem) {
   .service-card {
-    grid-template-columns: 1fr auto;
-    align-items: center;
+    grid-template-columns:
+      2.75rem
+      minmax(0, 1fr)
+      auto;
+
+    grid-template-areas:
+      "icon name arrow"
+      "icon details arrow"
+      "icon price arrow";
+
+    gap: 0.2rem 0.75rem;
   }
 
-  .service-card__button {
-    justify-self: end;
+  .service-card__icon {
+    grid-area: icon;
   }
+
+  .service-card__name {
+    grid-area: name;
+  }
+
+  .service-card__details {
+    grid-area: details;
+  }
+
+  .service-card__price {
+    grid-area: price;
+
+    justify-self: start;
+
+    margin-top: 0.25rem;
+  }
+
+  .service-card__arrow {
+    grid-area: arrow;
+  }
+}
+
+.service-card__arrow {
+  display: grid;
+  place-items: center;
+
+  justify-self: end;
+}
+
+.service-card__arrow svg {
+  width: 1.1rem;
+  height: 1.1rem;
+
+  stroke-width: 1.7;
 }

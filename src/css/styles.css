@@ -12,6 +12,12 @@
 @import "./components/button.css";
 @import "./components/progress-stepper.css";
 @import "./components/service-card.css";
+@import "./components/barber-card.css";
+@import "./components/time-slot.css";
+@import "./components/appointment-summary.css";
+@import "./components/date-picker.css";
 
 /* Pages */
+@import "./pages/date-time.css";
 @import "./pages/service.css";
+@import "./pages/barber.css";
