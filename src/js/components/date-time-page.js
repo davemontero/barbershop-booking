@@ -7,7 +7,12 @@ import { renderAppointmentSummary } from "./appointment-summary.js";
 import { renderIcon } from "./icon.js";
 
 export function renderDateTimePage(dateTimeViewState, bookingState) {
-  const canContinue = Boolean(bookingState.date && bookingState.time);
+  const hasAssignedBarber =
+    bookingState.barberPreference !== "first-available" || bookingState.barber;
+
+  const canContinue = Boolean(
+    bookingState.date && bookingState.time && hasAssignedBarber,
+  );
 
   return `
     <section

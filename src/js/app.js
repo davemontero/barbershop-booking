@@ -197,16 +197,29 @@ async function selectDate(date) {
 }
 
 async function selectTime(time) {
+  const serviceId = bookingState.service.id;
+  const date = bookingState.date;
+
   bookingState.time = time;
 
   if (bookingState.barberPreference === "first-available") {
     const availableBarbers = await bookingService.getAvailableBarbersForSlot({
-      serviceId: bookingState.service.id,
+      serviceId,
 
-      date: bookingState.date,
+      date,
 
       time,
     });
+
+    const selectionIsCurrent =
+      bookingState.service?.id === serviceId &&
+      bookingState.date === date &&
+      bookingState.time === time &&
+      bookingState.barberPreference === "first-available";
+
+    if (!selectionIsCurrent) {
+      return;
+    }
 
     bookingState.barber = availableBarbers[0] ?? null;
   }
