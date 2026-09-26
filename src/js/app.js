@@ -7,13 +7,7 @@ import { renderHeader } from "./components/header.js";
 import { renderProgressStepper } from "./components/progress-stepper.js";
 import { renderServicePage } from "./components/service-page.js";
 
-import {
-  getServices,
-  getBarbersForService,
-  getAvailableDates,
-  getAvailableTimes,
-  getAvailableBarbersForSlot,
-} from "./services/booking-service.js";
+import { bookingService } from "./booking/booking-service.js";
 
 import {
   initializeDatePicker,
@@ -25,8 +19,54 @@ import { renderBarberPage } from "./components/barber-page.js";
 
 const app = document.querySelector("#app");
 
-function renderApp() {
+async function renderCurrentStep() {
+  switch (bookingState.currentStep) {
+    case 1: {
+      const services = await bookingService.getServices();
+
+      return renderServicePage(services, bookingState.service?.id);
+    }
+
+    case 2: {
+      const barbers = await bookingService.getBarbersForService(
+        bookingState.service.id,
+      );
+
+      const selectedBarberId =
+        bookingState.barberPreference === "specific"
+          ? bookingState.barber?.id
+          : null;
+
+      return renderBarberPage(
+        barbers,
+        selectedBarberId,
+        bookingState.barberPreference,
+      );
+    }
+
+    case 3: {
+      const availableTimes = await bookingService.getAvailableTimes({
+        serviceId: bookingState.service.id,
+
+        barberId: bookingState.barber?.id,
+
+        preference: bookingState.barberPreference,
+
+        date: bookingState.date,
+      });
+
+      return renderDateTimePage(availableTimes, bookingState);
+    }
+
+    default:
+      return "";
+  }
+}
+
+async function renderApp() {
   destroyDatePicker();
+
+  const currentStepMarkup = await renderCurrentStep();
 
   app.innerHTML = `
     ${renderHeader()}
@@ -35,41 +75,20 @@ function renderApp() {
       <div class="container">
         ${renderProgressStepper(bookingState.currentStep)}
 
-        ${renderCurrentStep()}
+        ${currentStepMarkup}
       </div>
     </main>
   `;
 
-  initializeCurrentStep();
+  await initializeCurrentStep();
 }
 
-function selectService(serviceId) {
-  const services = getServices();
-
-  const selectedService = services.find((service) => service.id === serviceId);
-
-  if (!selectedService) {
-    return;
-  }
-
-  bookingState.service = selectedService;
-
-  bookingState.barber = null;
-  bookingState.barberPreference = null;
-  bookingState.date = null;
-  bookingState.time = null;
-
-  bookingState.currentStep = 2;
-
-  renderApp();
-}
-
-function initializeCurrentStep() {
+async function initializeCurrentStep() {
   if (bookingState.currentStep !== 3) {
     return;
   }
 
-  const availableDates = getAvailableDates({
+  const availableDates = await bookingService.getAvailableDates({
     serviceId: bookingState.service.id,
 
     barberId: bookingState.barber?.id,
@@ -88,50 +107,31 @@ function initializeCurrentStep() {
   });
 }
 
-function renderCurrentStep() {
-  switch (bookingState.currentStep) {
-    case 1: {
-      const services = getServices();
+async function selectService(serviceId) {
+  const services = await bookingService.getServices();
 
-      return renderServicePage(services, bookingState.service?.id);
-    }
+  const selectedService = services.find((service) => service.id === serviceId);
 
-    case 2: {
-      const barbers = getBarbersForService(bookingState.service.id);
-
-      const selectedBarberId =
-        bookingState.barberPreference === "specific"
-          ? bookingState.barber?.id
-          : null;
-
-      return renderBarberPage(
-        barbers,
-        selectedBarberId,
-        bookingState.barberPreference,
-      );
-    }
-
-    case 3: {
-      const availableTimes = getAvailableTimes({
-        serviceId: bookingState.service.id,
-
-        barberId: bookingState.barber?.id,
-
-        preference: bookingState.barberPreference,
-
-        date: bookingState.date,
-      });
-
-      return renderDateTimePage(availableTimes, bookingState);
-    }
-
-    default:
-      return "";
+  if (!selectedService) {
+    return;
   }
+
+  bookingState.service = selectedService;
+
+  bookingState.barber = null;
+  bookingState.barberPreference = null;
+  bookingState.date = null;
+  bookingState.time = null;
+
+  bookingState.currentStep = 2;
+
+  await renderApp();
 }
 
-function selectBarber(barberId) {
-  const barbers = getBarbersForService(bookingState.service.id);
+async function selectBarber(barberId) {
+  const barbers = await bookingService.getBarbersForService(
+    bookingState.service.id,
+  );
 
   const selectedBarber = barbers.find((barber) => barber.id === barberId);
 
@@ -146,10 +146,27 @@ function selectBarber(barberId) {
   bookingState.date = null;
   bookingState.time = null;
 
-  renderApp();
+  await renderApp();
 }
 
-function continueToDateTime() {
+async function selectFirstAvailable() {
+  bookingState.barber = null;
+
+  bookingState.barberPreference = "first-available";
+
+  bookingState.date = null;
+  bookingState.time = null;
+
+  await renderApp();
+}
+
+async function backToService() {
+  bookingState.currentStep = 1;
+
+  await renderApp();
+}
+
+async function continueToDateTime() {
   const hasBarber =
     bookingState.barber || bookingState.barberPreference === "first-available";
 
@@ -159,21 +176,16 @@ function continueToDateTime() {
 
   bookingState.currentStep = 3;
 
-  renderApp();
+  await renderApp();
 }
 
-function selectFirstAvailable() {
-  bookingState.barber = null;
+async function backToBarber() {
+  bookingState.currentStep = 2;
 
-  bookingState.barberPreference = "first-available";
-
-  bookingState.date = null;
-  bookingState.time = null;
-
-  renderApp();
+  await renderApp();
 }
 
-function selectDate(date) {
+async function selectDate(date) {
   bookingState.date = date;
 
   bookingState.time = null;
@@ -182,14 +194,14 @@ function selectDate(date) {
     bookingState.barber = null;
   }
 
-  renderApp();
+  await renderApp();
 }
 
-function selectTime(time) {
+async function selectTime(time) {
   bookingState.time = time;
 
   if (bookingState.barberPreference === "first-available") {
-    const availableBarbers = getAvailableBarbersForSlot({
+    const availableBarbers = await bookingService.getAvailableBarbersForSlot({
       serviceId: bookingState.service.id,
 
       date: bookingState.date,
@@ -200,26 +212,14 @@ function selectTime(time) {
     bookingState.barber = availableBarbers[0] ?? null;
   }
 
-  renderApp();
+  await renderApp();
 }
 
-function backToService() {
-  bookingState.currentStep = 1;
-
-  renderApp();
-}
-
-function backToBarber() {
-  bookingState.currentStep = 2;
-
-  renderApp();
-}
-
-app.addEventListener("click", (event) => {
+app.addEventListener("click", async (event) => {
   const serviceButton = event.target.closest('[data-action="select-service"]');
 
   if (serviceButton) {
-    selectService(serviceButton.dataset.serviceId);
+    await selectService(serviceButton.dataset.serviceId);
 
     return;
   }
@@ -227,14 +227,14 @@ app.addEventListener("click", (event) => {
   const barberButton = event.target.closest('[data-action="select-barber"]');
 
   if (barberButton) {
-    selectBarber(barberButton.dataset.barberId);
+    await selectBarber(barberButton.dataset.barberId);
   }
   const firstAvailableButton = event.target.closest(
     '[data-action="select-first-available"]',
   );
 
   if (firstAvailableButton) {
-    selectFirstAvailable();
+    await selectFirstAvailable();
 
     return;
   }
@@ -242,7 +242,7 @@ app.addEventListener("click", (event) => {
   const backButton = event.target.closest('[data-action="back-to-service"]');
 
   if (backButton) {
-    backToService();
+    await backToService();
 
     return;
   }
@@ -252,7 +252,7 @@ app.addEventListener("click", (event) => {
   );
 
   if (continueToDateTimeButton) {
-    continueToDateTime();
+    await continueToDateTime();
 
     return;
   }
@@ -260,7 +260,7 @@ app.addEventListener("click", (event) => {
   const dateButton = event.target.closest('[data-action="select-date"]');
 
   if (dateButton) {
-    selectDate(dateButton.dataset.date);
+    await selectDate(dateButton.dataset.date);
 
     return;
   }
@@ -268,7 +268,7 @@ app.addEventListener("click", (event) => {
   const timeButton = event.target.closest('[data-action="select-time"]');
 
   if (timeButton) {
-    selectTime(timeButton.dataset.time);
+    await selectTime(timeButton.dataset.time);
 
     return;
   }
@@ -278,10 +278,10 @@ app.addEventListener("click", (event) => {
   );
 
   if (backToBarberButton) {
-    backToBarber();
+    await backToBarber();
 
     return;
   }
 });
 
-renderApp();
+void renderApp();
