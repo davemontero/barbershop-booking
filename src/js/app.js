@@ -456,6 +456,7 @@ app.addEventListener("submit", async (event) => {
   const fields = form.querySelectorAll("input[required]");
 
   let isValid = true;
+  let firstInvalidField = null;
 
   fields.forEach((field) => {
     const formField = field.closest(".form-field");
@@ -466,12 +467,15 @@ app.addEventListener("submit", async (event) => {
 
     error.textContent = "";
 
-    if (!field.validity.valid) {
+    const isBlank = !field.value.trim();
+
+    if (!field.validity.valid || isBlank) {
       isValid = false;
+      firstInvalidField ??= field;
 
       formField.classList.add("form-field--invalid");
 
-      if (field.validity.valueMissing) {
+      if (field.validity.valueMissing || isBlank) {
         error.textContent = "This field is required.";
       } else if (field.validity.typeMismatch) {
         error.textContent = "Enter a valid value.";
@@ -480,26 +484,12 @@ app.addEventListener("submit", async (event) => {
   });
 
   if (!isValid) {
-    const firstInvalid = form.querySelector(":invalid");
-
-    firstInvalid?.focus();
+    firstInvalidField?.focus();
 
     return;
   }
 
   await confirmAppointment();
-  appointmentSubmissionState.status = "idle";
-
-  appointmentSubmissionState.error = null;
-
-  await renderApp();
-
-  /*
-   * Next milestone:
-   *
-   * review / confirmation
-   * → createAppointment()
-   */
 });
 
 async function loadAvailableDates() {
