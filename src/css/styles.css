@@ -17,8 +17,11 @@
 @import "./components/appointment-summary.css";
 @import "./components/date-picker.css";
 @import "./components/status-message.css";
+@import "./components/form.css";
 
 /* Pages */
 @import "./pages/date-time.css";
 @import "./pages/service.css";
 @import "./pages/barber.css";
+@import "./pages/details.css";
+@import "./pages/confirmation.css";

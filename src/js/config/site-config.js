@@ -15,5 +15,6 @@ export const siteConfig = {
 
   booking: {
     provider: "mock",
+    timezone: "America/Chicago",
   },
 };

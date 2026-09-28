@@ -5,16 +5,17 @@ import { bookingState } from "./state.js";
 import { renderHeader } from "./components/header.js";
 import { renderProgressStepper } from "./components/progress-stepper.js";
 import { renderServicePage } from "./components/service-page.js";
-
+import { renderDateTimePage } from "./components/date-time-page.js";
+import { renderBarberPage } from "./components/barber-page.js";
+import { renderDetailsPage } from "./components/details-page.js";
+import { renderConfirmationPage } from "./components/confirmation-page.js";
 import { bookingService } from "./booking/booking-service.js";
+import { buildAppointmentRequest } from "./booking/build-appointment-request.js";
 
 import {
   initializeDatePicker,
   destroyDatePicker,
 } from "./components/date-picker.js";
-
-import { renderDateTimePage } from "./components/date-time-page.js";
-import { renderBarberPage } from "./components/barber-page.js";
 
 const app = document.querySelector("#app");
 
@@ -26,6 +27,11 @@ const dateTimeViewState = {
   availableTimes: [],
   timesStatus: "idle",
   timesError: null,
+};
+
+const appointmentSubmissionState = {
+  status: "idle",
+  error: null,
 };
 
 let datesRequestId = 0;
@@ -60,6 +66,13 @@ async function renderCurrentStep() {
       return renderDateTimePage(dateTimeViewState, bookingState);
     }
 
+    case 4: {
+      return renderDetailsPage(bookingState, appointmentSubmissionState);
+    }
+    case 5: {
+      return renderConfirmationPage(bookingState);
+    }
+
     default:
       return "";
   }
@@ -70,15 +83,23 @@ async function renderApp() {
 
   const currentStepMarkup = await renderCurrentStep();
 
+  const isConfirmation = bookingState.currentStep === 5;
+
   app.innerHTML = `
     ${renderHeader()}
 
     <main class="booking-main">
-      <div class="container">
-        ${renderProgressStepper(bookingState.currentStep)}
+      ${
+        isConfirmation
+          ? currentStepMarkup
+          : `
+            <div class="container">
+              ${renderProgressStepper(bookingState.currentStep)}
 
-        ${currentStepMarkup}
-      </div>
+              ${currentStepMarkup}
+            </div>
+          `
+      }
     </main>
   `;
 
@@ -179,8 +200,42 @@ async function continueToDateTime() {
   await loadAvailableDates();
 }
 
+async function continueToDetails() {
+  const hasDateAndTime = bookingState.date && bookingState.time;
+
+  const hasBarber = Boolean(bookingState.barber);
+
+  if (!hasDateAndTime || !hasBarber) {
+    return;
+  }
+
+  bookingState.currentStep = 4;
+  appointmentSubmissionState.status = "idle";
+  appointmentSubmissionState.error = null;
+
+  await renderApp();
+}
+
 async function backToBarber() {
   bookingState.currentStep = 2;
+
+  await renderApp();
+}
+
+async function backToDateTime() {
+  bookingState.currentStep = 3;
+
+  await renderApp();
+}
+
+async function backToDetails() {
+  if (appointmentSubmissionState.status === "loading") {
+    return;
+  }
+
+  appointmentSubmissionState.status = "idle";
+
+  appointmentSubmissionState.error = null;
 
   await renderApp();
 }
@@ -225,6 +280,42 @@ async function selectTime(time) {
   }
 
   await renderApp();
+}
+
+async function confirmAppointment() {
+  if (appointmentSubmissionState.status === "loading") {
+    return;
+  }
+
+  appointmentSubmissionState.status = "loading";
+
+  appointmentSubmissionState.error = null;
+
+  await renderApp();
+
+  try {
+    const appointmentRequest = buildAppointmentRequest(bookingState);
+
+    const appointment =
+      await bookingService.createAppointment(appointmentRequest);
+
+    bookingState.appointment = appointment;
+
+    appointmentSubmissionState.status = "success";
+
+    bookingState.currentStep = 5;
+
+    await renderApp();
+  } catch (error) {
+    console.error("Failed to create appointment:", error);
+
+    appointmentSubmissionState.status = "error";
+
+    appointmentSubmissionState.error =
+      "Please verify your information and try again.";
+
+    await renderApp();
+  }
 }
 
 app.addEventListener("click", async (event) => {
@@ -294,6 +385,121 @@ app.addEventListener("click", async (event) => {
 
     return;
   }
+
+  const continueToDetailsButton = event.target.closest(
+    '[data-action="continue-to-details"]',
+  );
+
+  if (continueToDetailsButton) {
+    await continueToDetails();
+
+    return;
+  }
+
+  const backToDateTimeButton = event.target.closest(
+    '[data-action="back-to-date-time"]',
+  );
+
+  if (backToDateTimeButton) {
+    await backToDateTime();
+
+    return;
+  }
+
+  const backToDetailsButton = event.target.closest(
+    '[data-action="back-to-details"]',
+  );
+
+  if (backToDetailsButton) {
+    await backToDetails();
+
+    return;
+  }
+  const confirmAppointmentButton = event.target.closest(
+    '[data-action="confirm-appointment"]',
+  );
+
+  if (confirmAppointmentButton) {
+    await confirmAppointment();
+
+    return;
+  }
+});
+
+app.addEventListener("input", (event) => {
+  const field = event.target.closest(
+    "#customer-details-form input, #customer-details-form textarea",
+  );
+
+  if (!field) {
+    return;
+  }
+
+  const { name, value } = field;
+
+  if (!(name in bookingState.customer)) {
+    return;
+  }
+
+  bookingState.customer[name] = value;
+});
+
+app.addEventListener("submit", async (event) => {
+  const form = event.target.closest("#customer-details-form");
+
+  if (!form) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const fields = form.querySelectorAll("input[required]");
+
+  let isValid = true;
+
+  fields.forEach((field) => {
+    const formField = field.closest(".form-field");
+
+    const error = formField.querySelector(".form-field__error");
+
+    formField.classList.remove("form-field--invalid");
+
+    error.textContent = "";
+
+    if (!field.validity.valid) {
+      isValid = false;
+
+      formField.classList.add("form-field--invalid");
+
+      if (field.validity.valueMissing) {
+        error.textContent = "This field is required.";
+      } else if (field.validity.typeMismatch) {
+        error.textContent = "Enter a valid value.";
+      }
+    }
+  });
+
+  if (!isValid) {
+    const firstInvalid = form.querySelector(":invalid");
+
+    firstInvalid?.focus();
+
+    return;
+  }
+
+  await confirmAppointment();
+  appointmentSubmissionState.status = "idle";
+
+  appointmentSubmissionState.error = null;
+
+  await renderApp();
+
+  /*
+   * Next milestone:
+   *
+   * review / confirmation
+   * → createAppointment()
+   */
 });
 
 async function loadAvailableDates() {

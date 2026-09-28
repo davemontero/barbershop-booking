@@ -16,4 +16,5 @@ export const bookingState = {
     email: "",
     notes: "",
   },
+  appointment: null,
 };

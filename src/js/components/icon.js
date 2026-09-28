@@ -9,6 +9,10 @@ import userIcon from "@tabler/icons/outline/user.svg?raw";
 import loaderIcon from "@tabler/icons/outline/loader-2.svg?raw";
 import alertIcon from "@tabler/icons/outline/alert-circle.svg?raw";
 import scissorsIcon from "@tabler/icons/outline/scissors.svg?raw";
+import mapPinIcon from "@tabler/icons/outline/map-pin.svg?raw";
+import calendarPlusIcon from "@tabler/icons/outline/calendar-plus.svg?raw";
+import homeIcon from "@tabler/icons/outline/home.svg?raw";
+import externalLinkIcon from "@tabler/icons/outline/external-link.svg?raw";
 
 const icons = {
   "arrow-left": arrowLeftIcon,
@@ -22,6 +26,10 @@ const icons = {
   loader: loaderIcon,
   alert: alertIcon,
   scissors: scissorsIcon,
+  "map-pin": mapPinIcon,
+  "calendar-plus": calendarPlusIcon,
+  home: homeIcon,
+  "external-link": externalLinkIcon,
 };
 
 export function renderIcon(name) {

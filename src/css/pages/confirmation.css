@@ -1,0 +1,328 @@
+.confirmation-page {
+  display: grid;
+
+  min-height: calc(100vh - 4.5rem);
+
+  background: var(--color-background);
+}
+
+/* Main area */
+
+.confirmation-page__main {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+
+  padding: 4rem var(--space-6) var(--space-4);
+}
+
+.confirmation-page__inner {
+  width: min(100%, 52rem);
+
+  text-align: center;
+}
+
+/* Check */
+
+.confirmation-page__check {
+  display: grid;
+  place-items: center;
+
+  width: 3.6rem;
+  height: 3.6rem;
+
+  margin: 0 auto var(--space-4);
+
+  border-radius: 50%;
+
+  background: var(--color-primary);
+
+  color: var(--color-surface);
+}
+
+.confirmation-page__check svg {
+  width: 1.8rem;
+  height: 1.8rem;
+
+  stroke-width: 2;
+}
+
+/* Heading */
+
+.confirmation-page__title {
+  margin-bottom: 0.25rem;
+
+  font-size: clamp(1.8rem, 3vw, 2.25rem);
+  font-weight: 800;
+
+  text-transform: uppercase;
+}
+
+.confirmation-page__subtitle {
+  margin-bottom: var(--space-5);
+
+  color: var(--color-text-muted);
+
+  font-size: 0.95rem;
+}
+
+/* Appointment information */
+
+.confirmation-card {
+  display: grid;
+
+  gap: 1.75rem 2.5rem;
+
+  padding: 1.75rem 2rem;
+
+  border: 1px solid var(--color-border);
+
+  background: var(--color-surface);
+
+  text-align: left;
+}
+
+.confirmation-card__item {
+  display: grid;
+
+  grid-template-columns:
+    1.5rem
+    minmax(0, 1fr);
+
+  gap: var(--space-3);
+
+  align-items: start;
+}
+
+.confirmation-card__item svg {
+  width: 1.4rem;
+  height: 1.4rem;
+
+  stroke-width: 1.6;
+}
+
+.confirmation-card__item > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.confirmation-card__item span {
+  color: var(--color-text-muted);
+
+  font-size: 0.88rem;
+  font-weight: 600;
+
+  text-transform: uppercase;
+}
+
+.confirmation-card__item strong {
+  margin-top: 0.1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.confirmation-card__item small {
+  margin-top: 0.15rem;
+
+  color: var(--color-text-muted);
+
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+/* Actions */
+
+.confirmation-page__actions {
+  display: grid;
+
+  gap: var(--space-3);
+
+  margin-top: var(--space-5);
+}
+
+.confirmation-page__actions .button {
+  min-height: 3.25rem;
+
+  padding-inline: 1rem;
+
+  font-size: 0.78rem;
+}
+
+.confirmation-page__email-note {
+  margin: var(--space-4) 0 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 0.65rem;
+}
+
+.confirmation-page__reference {
+  margin-top: 0.35rem;
+
+  color: var(--color-text-muted);
+
+  font-size: 0.6rem;
+}
+
+/* Image panel */
+
+.confirmation-page__visual {
+  display: none;
+
+  position: relative;
+
+  min-height: 100%;
+
+  background:
+    linear-gradient(to bottom, rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.6)),
+    url("/images/confirmation/barber-chair.jpg") center / cover no-repeat;
+
+  color: #fff;
+}
+
+.confirmation-page__visual-content {
+  position: absolute;
+
+  right: var(--space-5);
+  bottom: var(--space-6);
+  left: var(--space-5);
+
+  display: flex;
+  flex-direction: column;
+
+  color: #fff;
+
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.confirmation-page__visual-content strong {
+  font-size: 1.2rem;
+
+  letter-spacing: 0.08em;
+}
+
+.confirmation-page__visual-content span {
+  margin-top: var(--space-2);
+
+  font-size: 0.65rem;
+
+  line-height: 1.5;
+}
+
+/* Center message */
+
+.confirmation-page__visual-message {
+  position: absolute;
+
+  top: 55%;
+  left: 50%;
+
+  width: 80%;
+
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.confirmation-page__visual-message strong {
+  font-size: 1.35rem;
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+}
+
+.confirmation-page__visual-message span:last-child {
+  max-width: 14rem;
+
+  font-size: 0.7rem;
+
+  line-height: 1.5;
+
+  letter-spacing: 0.06em;
+}
+
+/* Gold decorative line */
+
+.confirmation-page__visual-line {
+  width: 2.5rem;
+  height: 2px;
+
+  margin-block: 1rem;
+
+  background: var(--color-primary);
+}
+
+/* Bottom message */
+
+.confirmation-page__visual-footer {
+  position: absolute;
+
+  right: var(--space-5);
+  bottom: var(--space-6);
+  left: var(--space-5);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.confirmation-page__visual-footer strong {
+  font-size: 0.95rem;
+
+  letter-spacing: 0.1em;
+}
+
+.confirmation-page__visual-footer span {
+  max-width: 12rem;
+
+  margin-top: 0.45rem;
+
+  font-size: 0.6rem;
+
+  line-height: 1.5;
+
+  letter-spacing: 0.05em;
+}
+
+/* Tablet */
+
+@media (min-width: 48rem) {
+  .confirmation-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .confirmation-card__item--location {
+    grid-column: 2;
+  }
+
+  .confirmation-page__actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Desktop */
+
+@media (min-width: 64rem) {
+  .confirmation-page {
+    grid-template-columns:
+      minmax(0, 1fr)
+      clamp(20rem, 28vw, 27rem);
+  }
+
+  .confirmation-page__visual {
+    display: block;
+  }
+
+  .confirmation-page__main {
+    padding: 4.5rem var(--space-7) var(--space-6);
+  }
+}
