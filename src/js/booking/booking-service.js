@@ -19,10 +19,6 @@ export const bookingService = {
     return provider.getAvailableTimes(options);
   },
 
-  async getAvailableBarbersForSlot(options) {
-    return provider.getAvailableBarbersForSlot(options);
-  },
-
   async createAppointment(booking) {
     return provider.createAppointment(booking);
   },

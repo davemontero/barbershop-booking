@@ -203,14 +203,19 @@ async function continueToDateTime() {
 async function continueToDetails() {
   const hasDateAndTime = bookingState.date && bookingState.time;
 
-  const hasBarber = Boolean(bookingState.barber);
+  const hasValidStaffSelection =
+    bookingState.barberPreference === "first-available" ||
+    (bookingState.barberPreference === "specific" &&
+      Boolean(bookingState.barber));
 
-  if (!hasDateAndTime || !hasBarber) {
+  if (!hasDateAndTime || !hasValidStaffSelection) {
     return;
   }
 
   bookingState.currentStep = 4;
+
   appointmentSubmissionState.status = "idle";
+
   appointmentSubmissionState.error = null;
 
   await renderApp();
@@ -252,32 +257,10 @@ async function selectDate(date) {
 }
 
 async function selectTime(time) {
-  const serviceId = bookingState.service.id;
-  const date = bookingState.date;
-
   bookingState.time = time;
 
-  if (bookingState.barberPreference === "first-available") {
-    const availableBarbers = await bookingService.getAvailableBarbersForSlot({
-      serviceId,
-
-      date,
-
-      time,
-    });
-
-    const selectionIsCurrent =
-      bookingState.service?.id === serviceId &&
-      bookingState.date === date &&
-      bookingState.time === time &&
-      bookingState.barberPreference === "first-available";
-
-    if (!selectionIsCurrent) {
-      return;
-    }
-
-    bookingState.barber = availableBarbers[0] ?? null;
-  }
+  if (bookingState.barberPreference === "first-available")
+    bookingState.barber = null;
 
   await renderApp();
 }

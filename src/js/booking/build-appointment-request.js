@@ -4,21 +4,30 @@ export function buildAppointmentRequest(bookingState) {
   const { service, barber, barberPreference, date, time, customer } =
     bookingState;
 
-  if (!service || !barber || !date || !time) {
+  if (!service || !date || !time) {
     throw new Error("Booking is missing required appointment information.");
+  }
+
+  if (barberPreference === "specific" && !barber) {
+    throw new Error("A specific barber must be selected.");
   }
 
   return {
     serviceId: service.id,
 
-    barberPreference,
+    staff: {
+      mode:
+        barberPreference === "first-available" ? "first-available" : "specific",
 
-    barberId: barber.id,
+      barberId: barberPreference === "specific" ? barber.id : null,
+    },
 
-    date,
-    time,
+    start: {
+      date,
+      time,
 
-    timezone: siteConfig.booking.timezone,
+      timezone: siteConfig.booking.timezone,
+    },
 
     customer: {
       firstName: customer.firstName.trim(),

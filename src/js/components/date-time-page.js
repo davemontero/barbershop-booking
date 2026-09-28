@@ -10,8 +10,13 @@ export function renderDateTimePage(dateTimeViewState, bookingState) {
   const hasAssignedBarber =
     bookingState.barberPreference !== "first-available" || bookingState.barber;
 
+  const hasValidStaffSelection =
+    bookingState.barberPreference === "first-available" ||
+    (bookingState.barberPreference === "specific" &&
+      Boolean(bookingState.barber));
+
   const canContinue = Boolean(
-    bookingState.date && bookingState.time && hasAssignedBarber,
+    bookingState.date && bookingState.time && hasValidStaffSelection,
   );
 
   return `

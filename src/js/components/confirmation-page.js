@@ -32,7 +32,13 @@ function formatTime(time) {
 }
 
 export function renderConfirmationPage(bookingState) {
-  const { service, barber, date, time, customer, appointment } = bookingState;
+  const appointment = bookingState.appointment;
+
+  if (!appointment) {
+    return "";
+  }
+
+  const { service, barber, date, time, customer } = appointment;
 
   return `
     <section class="confirmation-page">

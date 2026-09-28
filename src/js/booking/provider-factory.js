@@ -1,5 +1,5 @@
 import { siteConfig } from "../config/site-config.js";
-
+import { assertBookingProvider } from "./provider-contract.js";
 import { mockBookingProvider } from "../providers/mock/mock-booking-provider.js";
 
 const providers = {
@@ -15,5 +15,5 @@ export function getBookingProvider() {
     throw new Error(`Unknown booking provider: ${providerName}`);
   }
 
-  return provider;
+  return assertBookingProvider(provider, providerName);
 }

@@ -22,6 +22,14 @@ function getEligibleBarbers({
   return compatibleBarbers.filter((barber) => barber.id === barberId);
 }
 
+function findAvailableBarber({ serviceId, date, time }) {
+  return getCompatibleBarbers(serviceId).find((barber) => {
+    const times = availability[barber.id]?.[date] ?? [];
+
+    return times.includes(time);
+  });
+}
+
 export const mockBookingProvider = {
   async getServices() {
     return services;
@@ -86,23 +94,54 @@ export const mockBookingProvider = {
     return [...times].sort();
   },
 
-  async getAvailableBarbersForSlot({ serviceId, date, time }) {
-    if (!date || !time) {
-      return [];
+  async createAppointment(request) {
+    let assignedBarber = null;
+
+    if (request.staff.mode === "specific") {
+      assignedBarber =
+        barbers.find((barber) => barber.id === request.staff.barberId) ?? null;
     }
 
-    return getCompatibleBarbers(serviceId).filter((barber) => {
-      const barberTimes = availability[barber.id]?.[date] ?? [];
+    if (request.staff.mode === "first-available") {
+      assignedBarber = findAvailableBarber({
+        serviceId: request.serviceId,
 
-      return barberTimes.includes(time);
-    });
-  },
+        date: request.start.date,
 
-  async createAppointment(booking) {
+        time: request.start.time,
+      });
+    }
+
+    if (!assignedBarber) {
+      throw new Error("No barber is available for the selected appointment.");
+    }
+
+    const service = services.find(
+      (service) => service.id === request.serviceId,
+    );
+
+    if (!service) {
+      throw new Error("Selected service does not exist.");
+    }
+
     return {
       id: `mock-${crypto.randomUUID()}`,
+
       status: "confirmed",
-      appointment: booking,
+
+      service,
+
+      barber: assignedBarber,
+
+      date: request.start.date,
+
+      time: request.start.time,
+
+      timezone: request.start.timezone,
+
+      customer: request.customer,
+
+      manageUrl: null,
     };
   },
 };
