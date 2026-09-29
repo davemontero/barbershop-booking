@@ -32,7 +32,18 @@ export function renderDateTimePage(dateTimeViewState, bookingState) {
           Choose an available date and time.
         </p>
       </header>
-
+      ${
+        dateTimeViewState.notice
+          ? `
+            <div
+              class="date-time-page__notice"
+              role="status"
+            >
+              ${dateTimeViewState.notice}
+            </div>
+          `
+          : ""
+      }
       <div class="date-time-page__layout">
         <section class="date-time-panel">
           <h2 class="date-time-panel__title">

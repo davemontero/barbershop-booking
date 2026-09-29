@@ -1,4 +1,8 @@
 import { services, barbers, availability } from "../../data/mock-data.js";
+import {
+  BookingError,
+  BOOKING_ERROR_CODES,
+} from "../../booking/booking-error.js";
 
 function getCompatibleBarbers(serviceId) {
   return barbers.filter((barber) => barber.services.includes(serviceId));
@@ -113,7 +117,16 @@ export const mockBookingProvider = {
     }
 
     if (!assignedBarber) {
-      throw new Error("No barber is available for the selected appointment.");
+      throw new BookingError({
+        code: BOOKING_ERROR_CODES.SLOT_UNAVAILABLE,
+
+        message: "No barber is available for the selected slot.",
+
+        userMessage:
+          "That appointment time is no longer available. Please choose another time.",
+
+        retryable: false,
+      });
     }
 
     const service = services.find(
@@ -121,7 +134,15 @@ export const mockBookingProvider = {
     );
 
     if (!service) {
-      throw new Error("Selected service does not exist.");
+      throw new BookingError({
+        code: BOOKING_ERROR_CODES.APPOINTMENT_REJECTED,
+
+        message: "Selected service does not exist.",
+
+        userMessage: "The selected service is no longer available.",
+
+        retryable: false,
+      });
     }
 
     return {

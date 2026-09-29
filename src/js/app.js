@@ -11,6 +11,7 @@ import { renderDetailsPage } from "./components/details-page.js";
 import { renderConfirmationPage } from "./components/confirmation-page.js";
 import { bookingService } from "./booking/booking-service.js";
 import { buildAppointmentRequest } from "./booking/build-appointment-request.js";
+import { BOOKING_ERROR_CODES } from "./booking/booking-error.js";
 
 import {
   initializeDatePicker,
@@ -23,6 +24,7 @@ const dateTimeViewState = {
   availableDates: [],
   datesStatus: "idle",
   datesError: null,
+  notice: null,
 
   availableTimes: [],
   timesStatus: "idle",
@@ -31,7 +33,12 @@ const dateTimeViewState = {
 
 const appointmentSubmissionState = {
   status: "idle",
+
   error: null,
+
+  errorCode: null,
+
+  retryable: false,
 };
 
 let datesRequestId = 0;
@@ -217,6 +224,8 @@ async function continueToDetails() {
   appointmentSubmissionState.status = "idle";
 
   appointmentSubmissionState.error = null;
+  appointmentSubmissionState.errorCode = null;
+  appointmentSubmissionState.retryable = false;
 
   await renderApp();
 }
@@ -246,6 +255,8 @@ async function backToDetails() {
 }
 
 async function selectDate(date) {
+  dateTimeViewState.notice = null;
+
   bookingState.date = date;
   bookingState.time = null;
 
@@ -271,8 +282,9 @@ async function confirmAppointment() {
   }
 
   appointmentSubmissionState.status = "loading";
-
   appointmentSubmissionState.error = null;
+  appointmentSubmissionState.errorCode = null;
+  appointmentSubmissionState.retryable = false;
 
   await renderApp();
 
@@ -290,12 +302,36 @@ async function confirmAppointment() {
 
     await renderApp();
   } catch (error) {
+    if (error.code === BOOKING_ERROR_CODES.SLOT_UNAVAILABLE) {
+      const notice =
+        error.userMessage ??
+        "That appointment time is no longer available. Please choose another time.";
+
+      bookingState.date = null;
+      bookingState.time = null;
+
+      appointmentSubmissionState.status = "idle";
+      appointmentSubmissionState.error = null;
+      appointmentSubmissionState.errorCode = null;
+      appointmentSubmissionState.retryable = false;
+
+      resetDateTimeViewState();
+      dateTimeViewState.notice = notice;
+
+      bookingState.currentStep = 3;
+
+      await loadAvailableDates();
+
+      return;
+    }
     console.error("Failed to create appointment:", error);
 
     appointmentSubmissionState.status = "error";
-
     appointmentSubmissionState.error =
-      "Please verify your information and try again.";
+      error.userMessage ?? "We couldn't create your appointment.";
+
+    appointmentSubmissionState.errorCode = error.code ?? "UNKNOWN_ERROR";
+    appointmentSubmissionState.retryable = Boolean(error.retryable);
 
     await renderApp();
   }
@@ -488,9 +524,7 @@ async function loadAvailableDates() {
   try {
     const availableDates = await bookingService.getAvailableDates({
       serviceId: bookingState.service.id,
-
       barberId: bookingState.barber?.id,
-
       preference: bookingState.barberPreference,
     });
 
@@ -519,7 +553,7 @@ async function loadAvailableDates() {
     dateTimeViewState.datesStatus = "error";
 
     dateTimeViewState.datesError =
-      "We couldn't load appointment dates. Please try again.";
+      error.userMessage ?? "We couldn't load appointment dates.";
   }
 
   await renderApp();
@@ -570,19 +604,20 @@ async function loadAvailableTimes() {
     dateTimeViewState.timesStatus = "error";
 
     dateTimeViewState.timesError =
-      "We couldn't load appointment times. Please try another date.";
+      error.userMessage ?? "We couldn't load appointment times.";
   }
 
   await renderApp();
 }
 
-function resetDateTimeViewState() {
+async function resetDateTimeViewState() {
   datesRequestId += 1;
   timesRequestId += 1;
 
   dateTimeViewState.availableDates = [];
   dateTimeViewState.datesStatus = "idle";
   dateTimeViewState.datesError = null;
+  dateTimeViewState.notice = null;
 
   dateTimeViewState.availableTimes = [];
   dateTimeViewState.timesStatus = "idle";
