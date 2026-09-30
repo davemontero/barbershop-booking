@@ -43,6 +43,11 @@ const appointmentSubmissionState = {
 
 let datesRequestId = 0;
 let timesRequestId = 0;
+let renderRequestId = 0;
+let serviceSelectionRequestId = 0;
+let barberSelectionRequestId = 0;
+
+// Renders
 
 async function renderCurrentStep() {
   switch (bookingState.currentStep) {
@@ -86,9 +91,14 @@ async function renderCurrentStep() {
 }
 
 async function renderApp() {
-  destroyDatePicker();
-
+  const requestId = ++renderRequestId;
   const currentStepMarkup = await renderCurrentStep();
+
+  if (requestId !== renderRequestId) {
+    return;
+  }
+
+  destroyDatePicker();
 
   const isConfirmation = bookingState.currentStep === 5;
 
@@ -109,6 +119,10 @@ async function renderApp() {
       }
     </main>
   `;
+
+  if (requestId !== renderRequestId) {
+    return;
+  }
 
   await initializeCurrentStep();
 }
@@ -133,21 +147,33 @@ async function initializeCurrentStep() {
   });
 }
 
+// SELECTION HANDLERS
+
 async function selectService(serviceId) {
+  const requestId = ++serviceSelectionRequestId;
   const services = await bookingService.getServices();
 
-  const selectedService = services.find((service) => service.id === serviceId);
-
-  if (!selectedService) {
+  if (requestId !== serviceSelectionRequestId) {
     return;
   }
 
-  bookingState.service = selectedService;
+  const service = services.find((item) => item.id === serviceId);
+
+  if (!service) {
+    return;
+  }
+
+  bookingState.service = service;
 
   bookingState.barber = null;
+
   bookingState.barberPreference = null;
+
   bookingState.date = null;
+
   bookingState.time = null;
+
+  bookingState.appointment = null;
 
   bookingState.currentStep = 2;
 
@@ -155,39 +181,110 @@ async function selectService(serviceId) {
 }
 
 async function selectBarber(barberId) {
-  const barbers = await bookingService.getBarbersForService(
-    bookingState.service.id,
-  );
+  const requestId = ++barberSelectionRequestId;
 
-  const selectedBarber = barbers.find((barber) => barber.id === barberId);
+  const serviceId = bookingState.service?.id;
 
-  if (!selectedBarber) {
+  if (!serviceId) {
     return;
   }
 
-  bookingState.barber = selectedBarber;
+  const barbers = await bookingService.getBarbersForService(serviceId);
+
+  if (requestId !== barberSelectionRequestId) {
+    return;
+  }
+
+  if (bookingState.service?.id !== serviceId) {
+    return;
+  }
+
+  const barber = barbers.find((item) => item.id === barberId);
+
+  if (!barber) {
+    return;
+  }
+
+  bookingState.barber = barber;
 
   bookingState.barberPreference = "specific";
 
   bookingState.date = null;
+
   bookingState.time = null;
+
+  bookingState.appointment = null;
+
+  await renderApp();
+}
+
+async function selectDate(date) {
+  dateTimeViewState.notice = null;
+
+  bookingState.date = date;
+  bookingState.time = null;
+
+  if (bookingState.barberPreference === "first-available") {
+    bookingState.barber = null;
+  }
+
+  await loadAvailableTimes();
+}
+
+async function selectTime(time) {
+  bookingState.time = time;
+
+  if (bookingState.barberPreference === "first-available")
+    bookingState.barber = null;
 
   await renderApp();
 }
 
 async function selectFirstAvailable() {
+  barberSelectionRequestId += 1;
+
   bookingState.barber = null;
 
   bookingState.barberPreference = "first-available";
 
   bookingState.date = null;
   bookingState.time = null;
+  bookingState.appointment = null;
 
   await renderApp();
 }
 
+// BACK AND CONTINUE HANDLERS
+
 async function backToService() {
+  serviceSelectionRequestId += 1;
+  barberSelectionRequestId += 1;
+
   bookingState.currentStep = 1;
+
+  await renderApp();
+}
+
+async function backToBarber() {
+  bookingState.currentStep = 2;
+
+  await renderApp();
+}
+
+async function backToDateTime() {
+  bookingState.currentStep = 3;
+
+  await renderApp();
+}
+
+async function backToDetails() {
+  if (appointmentSubmissionState.status === "loading") {
+    return;
+  }
+
+  appointmentSubmissionState.status = "idle";
+
+  appointmentSubmissionState.error = null;
 
   await renderApp();
 }
@@ -226,52 +323,6 @@ async function continueToDetails() {
   appointmentSubmissionState.error = null;
   appointmentSubmissionState.errorCode = null;
   appointmentSubmissionState.retryable = false;
-
-  await renderApp();
-}
-
-async function backToBarber() {
-  bookingState.currentStep = 2;
-
-  await renderApp();
-}
-
-async function backToDateTime() {
-  bookingState.currentStep = 3;
-
-  await renderApp();
-}
-
-async function backToDetails() {
-  if (appointmentSubmissionState.status === "loading") {
-    return;
-  }
-
-  appointmentSubmissionState.status = "idle";
-
-  appointmentSubmissionState.error = null;
-
-  await renderApp();
-}
-
-async function selectDate(date) {
-  dateTimeViewState.notice = null;
-
-  bookingState.date = date;
-  bookingState.time = null;
-
-  if (bookingState.barberPreference === "first-available") {
-    bookingState.barber = null;
-  }
-
-  await loadAvailableTimes();
-}
-
-async function selectTime(time) {
-  bookingState.time = time;
-
-  if (bookingState.barberPreference === "first-available")
-    bookingState.barber = null;
 
   await renderApp();
 }

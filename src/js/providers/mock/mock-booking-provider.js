@@ -34,14 +34,30 @@ function findAvailableBarber({ serviceId, date, time }) {
   });
 }
 
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export const mockBookingProvider = {
   async getServices() {
     return services;
   },
 
   async getBarbersForService(serviceId) {
+    if (serviceId === "haircut") {
+      await delay(1500);
+    }
+
+    if (serviceId === "beard-trim") {
+      await delay(200);
+    }
+
     return getCompatibleBarbers(serviceId);
   },
+
+  // async getBarbersForService(serviceId) {
+  //   return getCompatibleBarbers(serviceId);
+  // },
 
   async getAvailableDates({
     serviceId,
