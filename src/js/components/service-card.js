@@ -1,44 +1,53 @@
 import { renderIcon } from "./icon.js";
 
-export function renderServiceCard(service, selectedServiceId = null) {
-  const isSelected = service.id === selectedServiceId;
+import { escapeHtml } from "../utils/escape-html.js";
+
+export function renderServiceCard(service) {
+  const { id, name, description, duration, price, icon } = service;
 
   return `
     <button
-      class="service-card ${isSelected ? "service-card--selected" : ""}"
+      class="service-card"
       type="button"
       data-action="select-service"
-      data-service-id="${service.id}"
-      aria-pressed="${isSelected}"
+      data-service-id="${escapeHtml(id)}"
     >
-      <span class="service-card__icon">
+      <span
+        class="service-card__icon"
+        aria-hidden="true"
+      >
         <img
-          src="${service.icon}"
+          src="${escapeHtml(icon)}"
           alt=""
-          aria-hidden="true"
         >
       </span>
 
-      <span class="service-card__name">
-        ${service.name}
-      </span>
-
-      <span class="service-card__details">
-        <span class="service-card__duration">
-          ${service.duration} min
-        </span>
-
-        <span class="service-card__description">
-          ${service.description}
-        </span>
-      </span>
-
-      <span class="service-card__price">
-        $${service.price}
+      <span
+        class="service-card__name"
+      >
+        ${escapeHtml(name)}
       </span>
 
       <span
-        class="service-card__arrow"
+        class="service-card__details"
+      >
+        <strong>
+          ${duration} min
+        </strong>
+
+        <span>
+          ${escapeHtml(description)}
+        </span>
+      </span>
+
+      <strong
+        class="service-card__price"
+      >
+        $${price}
+      </strong>
+
+      <span
+        class="service-card__chevron"
         aria-hidden="true"
       >
         ${renderIcon("chevron-right")}

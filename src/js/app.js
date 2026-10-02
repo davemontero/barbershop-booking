@@ -41,37 +41,36 @@ const appointmentSubmissionState = {
   retryable: false,
 };
 
+const serviceViewState = {
+  services: [],
+  status: "idle",
+  error: null,
+};
+
+const barberViewState = {
+  barbers: [],
+  status: "idle",
+  error: null,
+  serviceId: null,
+};
+
 let datesRequestId = 0;
 let timesRequestId = 0;
 let renderRequestId = 0;
 let serviceSelectionRequestId = 0;
-let barberSelectionRequestId = 0;
+let servicesRequestId = 0;
+let barbersRequestId = 0;
 
 // Renders
 
 async function renderCurrentStep() {
   switch (bookingState.currentStep) {
     case 1: {
-      const services = await bookingService.getServices();
-
-      return renderServicePage(services, bookingState.service?.id);
+      return renderServicePage(serviceViewState, bookingState);
     }
 
     case 2: {
-      const barbers = await bookingService.getBarbersForService(
-        bookingState.service.id,
-      );
-
-      const selectedBarberId =
-        bookingState.barberPreference === "specific"
-          ? bookingState.barber?.id
-          : null;
-
-      return renderBarberPage(
-        barbers,
-        selectedBarberId,
-        bookingState.barberPreference,
-      );
+      return renderBarberPage(barberViewState, bookingState);
     }
 
     case 3: {
@@ -150,18 +149,15 @@ async function initializeCurrentStep() {
 // SELECTION HANDLERS
 
 async function selectService(serviceId) {
-  const requestId = ++serviceSelectionRequestId;
-  const services = await bookingService.getServices();
-
-  if (requestId !== serviceSelectionRequestId) {
-    return;
-  }
-
-  const service = services.find((item) => item.id === serviceId);
+  const service = serviceViewState.services.find(
+    (item) => item.id === serviceId,
+  );
 
   if (!service) {
     return;
   }
+
+  resetBarberViewState();
 
   bookingState.service = service;
 
@@ -170,28 +166,19 @@ async function selectService(serviceId) {
   bookingState.barberPreference = null;
 
   bookingState.date = null;
-
   bookingState.time = null;
 
   bookingState.appointment = null;
 
   bookingState.currentStep = 2;
 
-  await renderApp();
+  await loadBarbers();
 }
 
 async function selectBarber(barberId) {
-  const requestId = ++barberSelectionRequestId;
-
-  const serviceId = bookingState.service?.id;
+  const serviceId = barberViewState.serviceId;
 
   if (!serviceId) {
-    return;
-  }
-
-  const barbers = await bookingService.getBarbersForService(serviceId);
-
-  if (requestId !== barberSelectionRequestId) {
     return;
   }
 
@@ -199,7 +186,7 @@ async function selectBarber(barberId) {
     return;
   }
 
-  const barber = barbers.find((item) => item.id === barberId);
+  const barber = barberViewState.barbers.find((item) => item.id === barberId);
 
   if (!barber) {
     return;
@@ -241,8 +228,6 @@ async function selectTime(time) {
 }
 
 async function selectFirstAvailable() {
-  barberSelectionRequestId += 1;
-
   bookingState.barber = null;
 
   bookingState.barberPreference = "first-available";
@@ -258,7 +243,6 @@ async function selectFirstAvailable() {
 
 async function backToService() {
   serviceSelectionRequestId += 1;
-  barberSelectionRequestId += 1;
 
   bookingState.currentStep = 1;
 
@@ -390,6 +374,7 @@ async function confirmAppointment() {
 
 app.addEventListener("click", async (event) => {
   const serviceButton = event.target.closest('[data-action="select-service"]');
+  const barberButton = event.target.closest('[data-action="select-barber"]');
 
   if (serviceButton) {
     await selectService(serviceButton.dataset.serviceId);
@@ -397,11 +382,29 @@ app.addEventListener("click", async (event) => {
     return;
   }
 
-  const barberButton = event.target.closest('[data-action="select-barber"]');
-
   if (barberButton) {
     await selectBarber(barberButton.dataset.barberId);
   }
+
+  const retryServicesButton = event.target.closest(
+    '[data-action="retry-services"]',
+  );
+
+  if (retryServicesButton) {
+    await loadServices();
+    return;
+  }
+
+  const retryBarbersButton = event.target.closest(
+    '[data-action="retry-barbers"]',
+  );
+
+  if (retryBarbersButton) {
+    await loadBarbers();
+
+    return;
+  }
+
   const firstAvailableButton = event.target.closest(
     '[data-action="select-first-available"]',
   );
@@ -412,7 +415,7 @@ app.addEventListener("click", async (event) => {
     return;
   }
 
-  const backButton = event.target.closest('[data-action="back-to-service"]');
+  const backButton = event.target.closest('[data-action="back-to-services"]');
 
   if (backButton) {
     await backToService();
@@ -661,6 +664,95 @@ async function loadAvailableTimes() {
   await renderApp();
 }
 
+async function loadServices() {
+  const requestId = ++servicesRequestId;
+
+  serviceViewState.status = "loading";
+
+  serviceViewState.error = null;
+
+  await renderApp();
+
+  try {
+    const services = await bookingService.getServices();
+
+    if (requestId !== servicesRequestId) {
+      return;
+    }
+
+    serviceViewState.services = services;
+
+    serviceViewState.status = "success";
+  } catch (error) {
+    if (requestId !== servicesRequestId) {
+      return;
+    }
+
+    serviceViewState.services = [];
+
+    serviceViewState.status = "error";
+
+    serviceViewState.error = error.userMessage ?? "We couldn't load services.";
+  }
+
+  await renderApp();
+}
+
+async function loadBarbers() {
+  const serviceId = bookingState.service?.id;
+
+  if (!serviceId) {
+    return;
+  }
+
+  const requestId = ++barbersRequestId;
+
+  barberViewState.status = "loading";
+
+  barberViewState.error = null;
+
+  barberViewState.serviceId = serviceId;
+
+  await renderApp();
+
+  try {
+    const barbers = await bookingService.getBarbersForService(serviceId);
+
+    if (requestId !== barbersRequestId) {
+      return;
+    }
+
+    /*
+     * The service may have changed
+     * while the request was running.
+     */
+    if (bookingState.service?.id !== serviceId) {
+      return;
+    }
+
+    barberViewState.barbers = barbers;
+
+    barberViewState.status = "success";
+  } catch (error) {
+    if (requestId !== barbersRequestId) {
+      return;
+    }
+
+    if (bookingState.service?.id !== serviceId) {
+      return;
+    }
+
+    barberViewState.barbers = [];
+
+    barberViewState.status = "error";
+
+    barberViewState.error =
+      error.userMessage ?? "We couldn't load available barbers.";
+  }
+
+  await renderApp();
+}
+
 async function resetDateTimeViewState() {
   datesRequestId += 1;
   timesRequestId += 1;
@@ -675,4 +767,21 @@ async function resetDateTimeViewState() {
   dateTimeViewState.timesError = null;
 }
 
-void renderApp();
+function resetServiceViewState() {
+  servicesRequestId += 1;
+
+  serviceViewState.services = [];
+  serviceViewState.status = "idle";
+  serviceViewState.error = null;
+}
+
+function resetBarberViewState() {
+  barbersRequestId += 1;
+
+  barberViewState.barbers = [];
+  barberViewState.status = "idle";
+  barberViewState.error = null;
+  barberViewState.serviceId = null;
+}
+
+void loadServices();

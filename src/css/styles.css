@@ -18,6 +18,8 @@
 @import "./components/date-picker.css";
 @import "./components/status-message.css";
 @import "./components/form.css";
+@import "./components/first-available.css";
+@import "./components/barber-list.css";
 
 /* Pages */
 @import "./pages/date-time.css";

@@ -13,6 +13,7 @@ import mapPinIcon from "@tabler/icons/outline/map-pin.svg?raw";
 import calendarPlusIcon from "@tabler/icons/outline/calendar-plus.svg?raw";
 import homeIcon from "@tabler/icons/outline/home.svg?raw";
 import externalLinkIcon from "@tabler/icons/outline/external-link.svg?raw";
+import loader2Icon from "@tabler/icons/outline/loader-2.svg?raw";
 
 const icons = {
   "arrow-left": arrowLeftIcon,
@@ -30,6 +31,7 @@ const icons = {
   "calendar-plus": calendarPlusIcon,
   home: homeIcon,
   "external-link": externalLinkIcon,
+  "loader-2": loader2Icon,
 };
 
 export function renderIcon(name) {

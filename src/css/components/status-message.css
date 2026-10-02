@@ -4,44 +4,130 @@
 
   gap: var(--space-3);
 
-  min-height: 8rem;
-
-  padding: var(--space-4);
-
-  color: var(--color-text-muted);
+  color: var(--color-text);
 }
+
+/* =========================
+   ICON
+   ========================= */
 
 .status-message__icon {
   display: grid;
   place-items: center;
 
-  flex: 0 0 auto;
+  flex-shrink: 0;
+
+  width: 2rem;
+  height: 2rem;
+
+  color: var(--color-text-muted);
 }
 
 .status-message__icon svg {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
 
   stroke-width: 1.6;
 }
 
-.status-message__icon--loading {
-  animation: status-message-spin 900ms linear infinite;
+.status-message__icon--loading svg {
+  animation: status-message-spin 0.8s linear infinite;
+}
+
+/* =========================
+   CONTENT
+   ========================= */
+
+.status-message__content {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.2rem;
 }
 
 .status-message__title {
-  display: block;
-
-  color: var(--color-text);
-
   font-size: 0.8rem;
+  font-weight: 700;
 }
 
 .status-message__text {
-  margin: 0.2rem 0 0;
+  margin: 0;
+
+  color: var(--color-text-muted);
 
   font-size: 0.72rem;
+
+  line-height: 1.5;
 }
+
+/* =========================
+   INLINE VARIANT
+   ========================= */
+
+.status-message--inline {
+  padding: var(--space-3) 0;
+}
+
+/* =========================
+   PANEL VARIANT
+   ========================= */
+
+.status-message--panel {
+  flex-direction: column;
+  justify-content: center;
+
+  min-height: 11rem;
+
+  padding: var(--space-5);
+
+  border: 1px solid var(--color-border);
+
+  background: var(--color-surface);
+
+  text-align: center;
+}
+
+.status-message--panel .status-message__icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.status-message__icon--loading svg {
+  animation: status-message-spin 0.8s linear infinite;
+}
+
+.status-message--panel .status-message__content {
+  align-items: center;
+
+  gap: var(--space-2);
+}
+
+.status-message--panel .status-message__title {
+  font-size: 0.9rem;
+}
+
+.status-message--panel .status-message__text {
+  max-width: 26rem;
+
+  font-size: 0.78rem;
+}
+
+.status-message--panel .button {
+  margin-top: var(--space-2);
+}
+
+/* =========================
+   STATES
+   ========================= */
+
+.status-message--error .status-message__icon {
+  color: #a33;
+}
+
+/* =========================
+   ANIMATION
+   ========================= */
 
 @keyframes status-message-spin {
   to {

@@ -1,0 +1,13 @@
+.barber-list {
+  display: grid;
+
+  gap: var(--space-4);
+}
+
+/* Desktop */
+
+@media (min-width: 48rem) {
+  .barber-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
