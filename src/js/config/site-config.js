@@ -1,3 +1,6 @@
+const bookingApiBaseUrl =
+  import.meta.env?.VITE_BOOKING_API_BASE_URL?.trim() || "/api/booking";
+
 export const siteConfig = {
   businessName: "The Barber Studio",
 
@@ -16,5 +19,6 @@ export const siteConfig = {
   booking: {
     provider: "mock",
     timezone: "America/Chicago",
+    apiBaseUrl: bookingApiBaseUrl,
   },
 };
