@@ -1,6 +1,8 @@
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import { renderStatusMessage } from "./status-message.js";
+import { siteConfig } from "../config/site-config.js";
+import { getDateInTimeZone } from "../utils/date-time.js";
 
 let datePickerInstance = null;
 
@@ -78,7 +80,7 @@ export function initializeDatePicker({
 
     dateFormat: "Y-m-d",
 
-    minDate: "today",
+    minDate: getDateInTimeZone(siteConfig.booking.timezone),
 
     enable: availableDates,
 

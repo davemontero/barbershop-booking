@@ -1,5 +1,6 @@
 import { getBookingProvider } from "./provider-factory.js";
 import { normalizeBookingError } from "./booking-error.js";
+import { normalizeAppointment } from "./appointment-contract.js";
 
 const provider = getBookingProvider();
 
@@ -28,7 +29,15 @@ export const bookingService = {
     return executeProviderCall(() => provider.getAvailableTimes(options));
   },
 
-  async createAppointment(booking) {
-    return executeProviderCall(() => provider.createAppointment(booking));
+  async createAppointment(appointmentRequest) {
+    const appointment = await executeProviderCall(
+      () => provider.createAppointment(appointmentRequest),
+      {
+        fallbackUserMessage:
+          "We couldn't create your appointment. Please try again.",
+      },
+    );
+
+    return normalizeAppointment(appointment);
   },
 };

@@ -57,7 +57,6 @@ const barberViewState = {
 let datesRequestId = 0;
 let timesRequestId = 0;
 let renderRequestId = 0;
-let serviceSelectionRequestId = 0;
 let servicesRequestId = 0;
 let barbersRequestId = 0;
 
@@ -242,8 +241,6 @@ async function selectFirstAvailable() {
 // BACK AND CONTINUE HANDLERS
 
 async function backToService() {
-  serviceSelectionRequestId += 1;
-
   bookingState.currentStep = 1;
 
   await renderApp();
