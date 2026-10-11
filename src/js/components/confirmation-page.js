@@ -1,5 +1,5 @@
 import { siteConfig } from "../config/site-config.js";
-
+import { getAppUrl } from "../utils/app-url.js";
 import { renderIcon } from "./icon.js";
 
 function formatDate(date) {
@@ -33,6 +33,7 @@ function formatTime(time) {
 
 export function renderConfirmationPage(bookingState) {
   const appointment = bookingState.appointment;
+  const confirmationImage = getAppUrl("images/confirmation/barber-chair.jpg");
 
   if (!appointment) {
     return "";
@@ -194,6 +195,10 @@ export function renderConfirmationPage(bookingState) {
 
       <aside
         class="confirmation-page__visual"
+        style="
+          --confirmation-image:
+            url('${confirmationImage}');
+        "
         aria-hidden="true"
       >
         <div class="confirmation-page__visual-message">

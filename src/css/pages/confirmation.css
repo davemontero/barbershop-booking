@@ -175,7 +175,7 @@
 
   background:
     linear-gradient(to bottom, rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.6)),
-    url("/images/confirmation/barber-chair.jpg") center / cover no-repeat;
+    var(--confirmation-image) center / cover no-repeat;
 
   color: #fff;
 }
