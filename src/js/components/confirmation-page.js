@@ -34,6 +34,7 @@ function formatTime(time) {
 export function renderConfirmationPage(bookingState) {
   const appointment = bookingState.appointment;
   const confirmationImage = getAppUrl("images/confirmation/barber-chair.jpg");
+  const bookingHomeUrl = getAppUrl();
 
   if (!appointment) {
     return "";
@@ -166,7 +167,7 @@ export function renderConfirmationPage(bookingState) {
 
             <a
               class="button button--primary"
-              href="/"
+              href="${bookingHomeUrl}"
             >
               ${renderIcon("home")}
               Back to Home
