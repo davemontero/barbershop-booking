@@ -47,7 +47,7 @@ export const barbers = [
     name: "Alex Morgan",
     role: "Master Barber",
     description: "10+ years of experience",
-    image: "",
+    image: "images/barbers/Alex-Morgan.webp",
     services: [
       "haircut",
       "haircut-beard",
@@ -62,7 +62,7 @@ export const barbers = [
     name: "Liam Carter",
     role: "Barber",
     description: "Building the next generation",
-    image: "",
+    image: "images/barbers/Liam-Carter.webp",
     services: ["haircut", "haircut-beard", "kids-haircut", "beard-trim"],
   },
 
@@ -71,7 +71,7 @@ export const barbers = [
     name: "Noah Bennett",
     role: "Barber",
     description: "Passionate about great cuts",
-    image: "",
+    image: "images/barbers/Noah-Bennett.webp",
     services: ["haircut", "haircut-beard"],
   },
 ];
